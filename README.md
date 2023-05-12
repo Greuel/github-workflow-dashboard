@@ -1,1 +1,1 @@
-# github-workflow-api
+# github-workflow-dashboard
