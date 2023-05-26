@@ -1,19 +1,8 @@
 import * as React from 'react';
-import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
-import Title from './Title';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
-import { useEffect, useState } from "react";
-
-function preventDefault(event: React.MouseEvent) {
-  event.preventDefault();
-}
+import { useEffect, useState } from 'react';
 
 function useCompleted() {
   const [completedData, setCompletedData] = useState<any[]>([]);
@@ -21,10 +10,10 @@ function useCompleted() {
 
   useEffect(() => {
     setLoading(true);
-    fetch("http://localhost:3100/completed")
-      .then(response => response.json())
-      .then(json => {
-        console.log("Fetched completed data:", json); // Debugging statement
+    fetch('http://localhost:3100/completed')
+      .then((response) => response.json())
+      .then((json) => {
+        console.log('Fetched completed data:', json); // Debugging statement
         setCompletedData(json);
       })
       .finally(() => {
@@ -32,14 +21,14 @@ function useCompleted() {
       });
   }, []);
 
-  console.log("Completed data:", completedData); // Debugging statement
-  return {completedData,loading};
+  console.log('Completed data:', completedData); // Debugging statement
+  return { completedData, loading };
 }
 
 export default function Completed() {
-  const {completedData, loading} = useCompleted();
+  const { completedData, loading } = useCompleted();
   const completedSize = completedData.length;
-  console.log("Completed:", completedData);
+  console.log('Completed:', completedData);
   if (loading) {
     return (
       <Box sx={{ display: 'flex' }}>
@@ -50,7 +39,9 @@ export default function Completed() {
   return (
     <React.Fragment>
       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-        <Typography variant="h6" sx={{ textAlign: 'center', mb: 2 }}>Jobs Completed</Typography>
+        <Typography variant="h6" sx={{ textAlign: 'center', mb: 2 }}>
+          Jobs Completed
+        </Typography>
         <Box
           sx={{
             display: 'flex',

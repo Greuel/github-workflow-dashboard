@@ -1,26 +1,39 @@
-import logo from './logo.svg';
-import './App.css';
-import { useEffect, useState } from "react";
-import material from '@mui/material';
-import * as Icons from '@mui/icons-material';
-import styled from '@emotion/styled';
-import react from '@emotion/react';
-import Dashboard from './Dashboard';
-import React from 'react';
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
+import { ErrorBoundary } from 'react-error-boundary';
+import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
+import { red } from '@mui/material/colors';
+import NavigationDrawer from './NavigationDrawer';
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Dashboard />,
+// A custom theme for this app
+const theme = createTheme({
+  palette: {
+    error: {
+      main: red.A400,
+    },
+    background: {
+      default: '#eeeeee',
+    },
   },
-  {
-    path: "/workflows",
-    element: <div>Hello World</div>
-  }
-]);
+});
 
-export default router;
+function fallbackRender({ error }: { error: Error }) {
+  return (
+    <div role="alert">
+      <p>Something went wrong:</p>
+      <pre style={{ color: 'red' }}>{error.message}</pre>
+    </div>
+  );
+}
+
+const App: React.FC = () => {
+  return (
+    <ErrorBoundary fallbackRender={fallbackRender}>
+      <ThemeProvider theme={theme}>
+        {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+        <CssBaseline />
+        <NavigationDrawer />
+      </ThemeProvider>
+    </ErrorBoundary>
+  );
+};
+
+export default App;

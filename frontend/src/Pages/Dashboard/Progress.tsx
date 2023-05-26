@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
-import Title from '../Title';
+import Title from '../../components/Title';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -9,17 +9,12 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
-import { useEffect, useState } from "react";
 import useProgressData from './useProgressData';
-import { Grid, Paper, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
-
-function preventDefault(event: React.MouseEvent) {
-  event.preventDefault();
-}
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 
 export function ProgressSize() {
-  const {loading, progressSize, progressData } = useProgressData();
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const { loading, progressSize, progressData } = useProgressData();
+  const [dialogOpen, setDialogOpen] = React.useState(false);
   const handleDialogOpen = () => {
     setDialogOpen(true);
   };
@@ -36,7 +31,9 @@ export function ProgressSize() {
   return (
     <React.Fragment>
       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-        <Typography variant="h6" sx={{ textAlign: 'center', mb: 2 }}>Jobs in Progress</Typography>
+        <Typography variant="h6" sx={{ textAlign: 'center', mb: 2 }}>
+          Jobs in Progress
+        </Typography>
         <Box
           sx={{
             display: 'flex',
@@ -68,19 +65,14 @@ export function ProgressSize() {
 }
 
 export function ProgressData() {
-  const {progressData, loading } = useProgressData();
+  const { progressData, loading } = useProgressData();
   const [page, setPage] = React.useState(2);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const handlePageChange = (
-    event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number,
-  ) => {
+  const handlePageChange = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
   };
 
-  const handleRowsPerPageChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
+  const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
@@ -98,36 +90,36 @@ export function ProgressData() {
   const paginatedProgress = progressData.slice(startIndex, endIndex);
 
   return (
-   <React.Fragment>
-     <Title>Current In Progress: {totalProgress}</Title>
-     <Table size="small">
-     <TableHead>
-       <TableRow>
-         <TableCell>id</TableCell>
-         <TableCell>Repository</TableCell>
-         <TableCell>Date</TableCell>
-         <TableCell>Status</TableCell>
-         <TableCell>Workflow Name</TableCell>
-         <TableCell>Link</TableCell>
-       </TableRow>
-     </TableHead>
-     <TableBody>
-       {progressData.map((progress) => (
-         <TableRow>
-           <TableCell>{progress.id}</TableCell>
-           <TableCell>{progress.repo_name}</TableCell>
-           <TableCell>{progress.timestamp}</TableCell>
-           <TableCell>{progress.status}</TableCell>
-           <TableCell>{progress.workflow_name}</TableCell>
-           <TableCell>
-             <Link color="primary" href={progress.url}>
-               {progress.url}
-             </Link>
-           </TableCell>
-         </TableRow>
-       ))}
-     </TableBody>
-     </Table>
-   </React.Fragment>
- );
+    <React.Fragment>
+      <Title>Current In Progress: {totalProgress}</Title>
+      <Table size="small">
+        <TableHead>
+          <TableRow>
+            <TableCell>id</TableCell>
+            <TableCell>Repository</TableCell>
+            <TableCell>Date</TableCell>
+            <TableCell>Status</TableCell>
+            <TableCell>Workflow Name</TableCell>
+            <TableCell>Link</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {progressData.map((progress) => (
+            <TableRow>
+              <TableCell>{progress.id}</TableCell>
+              <TableCell>{progress.repo_name}</TableCell>
+              <TableCell>{progress.timestamp}</TableCell>
+              <TableCell>{progress.status}</TableCell>
+              <TableCell>{progress.workflow_name}</TableCell>
+              <TableCell>
+                <Link color="primary" href={progress.url}>
+                  {progress.url}
+                </Link>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </React.Fragment>
+  );
 }
