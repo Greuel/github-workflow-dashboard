@@ -49,7 +49,7 @@ session = Session()
 Base.metadata.create_all(engine)
 
 # Password setup
-WEBHOOK_PASSWORD = '2463!&)sndkHwze42'
+WEBHOOK_PASSWORD = 'mywebhookpassword'
 # Hash the password
 hashed_password = hashlib.sha256(WEBHOOK_PASSWORD.encode()).hexdigest()
 print(hashed_password)
