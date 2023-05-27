@@ -1,7 +1,7 @@
 import * as React from 'react';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
-import Title from '../../components/Title';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -10,18 +10,24 @@ import TableRow from '@mui/material/TableRow';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import Alert from '@mui/material/Alert';
-import useQueueData from './useQueueData';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
+
+import Title from '../../components/Title';
+import useData, { BASE_URL } from '../../common/useData';
 
 export function QueueSize() {
-  const { loading, queueSize, queueData } = useQueueData();
+  // TODO: find out the types of queue api
+  const { loading, data: queue } = useData<any[]>(`${BASE_URL}/queue`);
+  const queueSize = queue?.length ?? 0;
+
   const [dialogOpen, setDialogOpen] = React.useState(false);
+
   const handleDialogOpen = () => {
     setDialogOpen(true);
   };
   const handleDialogClose = () => {
     setDialogOpen(false);
   };
+
   if (loading) {
     return (
       <Box sx={{ display: 'flex' }}>
@@ -29,6 +35,7 @@ export function QueueSize() {
       </Box>
     );
   }
+
   return (
     <React.Fragment>
       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -66,17 +73,13 @@ export function QueueSize() {
 }
 
 export function QueueData() {
-  const { queueData, loading } = useQueueData();
+  const { loading, data: queueData = [], error } = useData<any[]>('queue');
   const [page, setPage] = React.useState(2);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
   const calculateTimeInQueue = (timestamp: string) => {
     const queueTime = new Date(timestamp); // Convert the queue timestamp to a Date object
     const currentTime = new Date(); // Get the current time
-
-    // Convert the timestamps to local time strings
-    const queueTimeString = queueTime.toLocaleString();
-    const currentTimeString = currentTime.toLocaleString();
 
     // Calculate the time difference in milliseconds
     const timeDifference = currentTime.getTime() - queueTime.getTime();
@@ -88,6 +91,7 @@ export function QueueData() {
 
     return `${days} days, ${hours % 24} hours, ${minutes % 60} minutes`;
   };
+
   const handlePageChange = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
   };
@@ -96,6 +100,22 @@ export function QueueData() {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
+  const totalQueue = queueData.length;
+  // Pagination calculations
+  const startIndex = page * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+  const paginatedQueue = queueData.slice(startIndex, endIndex);
+
+  if (error) {
+    return (
+      <div role="alert">
+        <p>Something went wrong:</p>
+        <pre style={{ color: 'red' }}>{error.message}</pre>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <Box sx={{ display: 'flex' }}>
@@ -103,11 +123,6 @@ export function QueueData() {
       </Box>
     );
   }
-  const totalQueue = queueData.length;
-  // Pagination calculations
-  const startIndex = page * rowsPerPage;
-  const endIndex = startIndex + rowsPerPage;
-  const paginatedQueue = queueData.slice(startIndex, endIndex);
 
   return (
     <React.Fragment>

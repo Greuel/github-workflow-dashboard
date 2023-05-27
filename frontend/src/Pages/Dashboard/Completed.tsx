@@ -2,33 +2,13 @@ import * as React from 'react';
 import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
-import { useEffect, useState } from 'react';
-
-function useCompleted() {
-  const [completedData, setCompletedData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    setLoading(true);
-    fetch('http://localhost:3100/completed')
-      .then((response) => response.json())
-      .then((json) => {
-        console.log('Fetched completed data:', json); // Debugging statement
-        setCompletedData(json);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
-
-  console.log('Completed data:', completedData); // Debugging statement
-  return { completedData, loading };
-}
+import useData, { BASE_URL } from '../../common/useData';
 
 export default function Completed() {
-  const { completedData, loading } = useCompleted();
-  const completedSize = completedData.length;
-  console.log('Completed:', completedData);
+  // TODO: find out the types of completed api
+  const { loading, data: completedData } = useData<any[]>(`${BASE_URL}/completed`);
+  const completedSize = completedData?.length ?? 0;
+
   if (loading) {
     return (
       <Box sx={{ display: 'flex' }}>
@@ -36,6 +16,7 @@ export default function Completed() {
       </Box>
     );
   }
+
   return (
     <React.Fragment>
       <Box sx={{ display: 'flex', flexDirection: 'column' }}>

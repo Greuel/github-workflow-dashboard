@@ -1,7 +1,7 @@
 import * as React from 'react';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
-import Title from '../../components/Title';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -9,11 +9,14 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
-import useProgressData from './useProgressData';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
+import Title from '../../components/Title';
+import useData, { BASE_URL } from '../../common/useData';
 
 export function ProgressSize() {
-  const { loading, progressSize, progressData } = useProgressData();
+  // TODO: find out the types of progress api
+  const { loading, data: progressData } = useData<any[]>(`${BASE_URL}/in_progress`);
+  const progressSize = progressData?.length ?? 0;
+
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const handleDialogOpen = () => {
     setDialogOpen(true);
@@ -21,6 +24,7 @@ export function ProgressSize() {
   const handleDialogClose = () => {
     setDialogOpen(false);
   };
+
   if (loading) {
     return (
       <Box sx={{ display: 'flex' }}>
@@ -65,7 +69,8 @@ export function ProgressSize() {
 }
 
 export function ProgressData() {
-  const { progressData, loading } = useProgressData();
+  const { loading, data: progressData = [], error } = useData<any[]>('in_progress');
+
   const [page, setPage] = React.useState(2);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const handlePageChange = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
@@ -76,6 +81,16 @@ export function ProgressData() {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
+  if (error) {
+    return (
+      <div role="alert">
+        <p>Something went wrong:</p>
+        <pre style={{ color: 'red' }}>{error.message}</pre>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <Box sx={{ display: 'flex' }}>

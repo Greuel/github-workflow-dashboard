@@ -8,7 +8,6 @@ import {
   ListItemText,
   useMediaQuery,
   Grid,
-  Link,
   Divider,
   Typography,
   List,
@@ -19,7 +18,8 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import AltRouteIcon from '@mui/icons-material/AltRoute';
-import Dashboard from './Pages/Dashboard/Dashboard';
+import Dashboard from './Pages/Dashboard';
+import Workflows from './Pages/Workflows';
 
 function NavigationDrawer() {
   const navigate = useNavigate();
@@ -38,10 +38,6 @@ function NavigationDrawer() {
       setDrawerPadding(drawerElement.clientWidth);
     }
   }, []);
-
-  const toggleDrawer = () => {
-    setMenuOpen(!menuOpen);
-  };
 
   const onNavigationEntryClicked = (path: string) => {
     setMenuOpen(false);
@@ -111,7 +107,7 @@ function NavigationDrawer() {
       <main style={{ marginTop: '7rem', paddingLeft: `${drawerPadding}px` }}>
         <Routes>
           <Route path="/" element={<Dashboard />} />
-          <Route path="/workflows" element={<div>Hi blablablablablalbalblabalbla</div>} />
+          <Route path="/workflows" element={<Workflows />} />
           <Route element={<div>Not Found</div>} />
         </Routes>
       </main>

@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { Box, CircularProgress } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
+import useData from '../../common/useData';
 
 interface Status {
   page: {
@@ -18,19 +20,8 @@ interface Status {
 }
 
 function GitHubStatus() {
-  const [status, setStatus] = useState<Status>();
+  const { loading, data: status } = useData<Status>('https://www.githubstatus.com/api/v2/status.json');
   const [openDialog, setOpenDialog] = useState(false);
-
-  useEffect(() => {
-    fetch('https://www.githubstatus.com/api/v2/status.json')
-      .then((response) => response.json())
-      .then((data) => {
-        setStatus(data);
-      })
-      .catch((error) => {
-        console.error('Error fetching GitHub status:', error);
-      });
-  }, []);
 
   const handleDialogOpen = () => {
     setOpenDialog(true);
@@ -39,6 +30,14 @@ function GitHubStatus() {
   const handleDialogClose = () => {
     setOpenDialog(false);
   };
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>

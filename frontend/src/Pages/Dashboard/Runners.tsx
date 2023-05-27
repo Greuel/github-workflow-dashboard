@@ -5,39 +5,19 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Title from '../../components/Title';
-import { useEffect, useState } from 'react';
 import TableFooter from '@mui/material/TableFooter';
 import TablePagination from '@mui/material/TablePagination';
 import { CheckCircle, Warning, Schedule } from '@mui/icons-material';
-import { ListItemIcon } from '@mui/material';
+import { Box, CircularProgress, ListItemIcon } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
-
-async function getRunners() {
-  const response = await fetch('http://localhost:3100/runners');
-  const json = await response.json();
-  console.log('Fetched runner data:', json); // Debugging statement
-  return json;
-}
+import useData, { BASE_URL } from '../../common/useData';
 
 export default function Runners() {
-  const [runners, setRunners] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-
-  useEffect(() => {
-    setLoading(true);
-    getRunners()
-      .then((data) => {
-        setRunners(data);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
-
-  console.log('Runners:', runners); // Debugging statement
+  // TODO: find out the types of runners api
+  const { loading, data: runners = [] } = useData<any[]>(`${BASE_URL}/runners`);
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
   const handlePageChange = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
@@ -73,6 +53,14 @@ export default function Runners() {
   const startIndex = page * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
   const paginatedRunners = runners.slice(startIndex, endIndex);
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <React.Fragment>
