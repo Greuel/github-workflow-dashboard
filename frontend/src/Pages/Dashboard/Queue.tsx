@@ -73,7 +73,7 @@ export function QueueSize() {
 }
 
 export function QueueData() {
-  const { loading, data: queueData = [], error } = useData<any[]>('queue');
+  const { loading, data: queueData = [], error } = useData<any[]>(`${BASE_URL}/queue`);
   const [page, setPage] = React.useState(2);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 

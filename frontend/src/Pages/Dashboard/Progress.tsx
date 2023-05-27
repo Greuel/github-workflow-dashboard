@@ -69,7 +69,7 @@ export function ProgressSize() {
 }
 
 export function ProgressData() {
-  const { loading, data: progressData = [], error } = useData<any[]>('in_progress');
+  const { loading, data: progressData = [], error } = useData<any[]>(`${BASE_URL}/in_progress`);
 
   const [page, setPage] = React.useState(2);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
