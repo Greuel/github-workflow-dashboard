@@ -1,5 +1,6 @@
 version: '3'
 services:
+
   backend:
     build: ../backend
     ports:
@@ -11,13 +12,25 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=github
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ../frontend
+    ports:
+      - 3000:3000
 
   db:
     image: postgres
     ports:
       - 5432:5432
     restart: always
+    user: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres

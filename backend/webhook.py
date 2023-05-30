@@ -22,10 +22,6 @@ postgres_user = os.getenv('POSTGRES_USER')
 postgres_password = os.getenv('POSTGRES_PASSWORD')
 postgres_db = os.getenv('POSTGRES_DB')
 
-
-ORG_NAME = f"{org_name}"
-ACCESS_TOKEN = f"{access_token}"
-
 # SQLAlchemy setup
 engine = create_engine(
     f'postgresql://{postgres_user}:{postgres_password}@host.docker.internal:5432/{postgres_db}')
@@ -273,18 +269,18 @@ def get_completed_jobs():
 
 # Set request headers with authorization token
 headers = {
-    'Authorization': f'token {ACCESS_TOKEN}',
+    'Authorization': f'token {access_token}',
     'Accept': 'application/vnd.github.v3+json'
 }
 
 @app.route('/runners')
 def get_runners():
-    runnerUrl = f"https://api.github.com/orgs/{ORG_NAME}/actions/runners"
+    runnerUrl = f"https://api.github.com/orgs/{org_name}/actions/runners"
     response = requests.get(runnerUrl, headers=headers)
 
     if response.status_code != 200:
         print(
-            f"Failed to get runners for organization {ORG_NAME}. Status code: {response.status_code}")
+            f"Failed to get runners for organization {org_name}. Status code: {response.status_code}")
         exit()
 
     runners = response.json()
