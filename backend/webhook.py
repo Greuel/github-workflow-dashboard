@@ -11,17 +11,26 @@ from datetime import datetime, timedelta
 import requests
 import hashlib
 import logging
+import os
+import time
 
 app = Flask(__name__)
 
-ORG_NAME = 'myorg'
-ACCESS_TOKEN = 'myaccesstoken'
+org_name = os.getenv('ORG_NAME')
+access_token = os.getenv('ACCESS_TOKEN')
+postgres_user = os.getenv('POSTGRES_USER')
+postgres_password = os.getenv('POSTGRES_PASSWORD')
+postgres_db = os.getenv('POSTGRES_DB')
+
+
+ORG_NAME = f"{org_name}"
+ACCESS_TOKEN = f"{access_token}"
 
 # SQLAlchemy setup
 engine = create_engine(
-    'postgresql://postgres:mypassword@localhost:5432/github')
+    f'postgresql://{postgres_user}:{postgres_password}@host.docker.internal:5432/{postgres_db}')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:mypassword@localhost:5432/github'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{postgres_user}:{postgres_password}@host.docker.internal:5432/{postgres_db}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -47,13 +56,6 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 Base.metadata.create_all(engine)
-
-# Password setup
-WEBHOOK_PASSWORD = 'mywebhookpassword'
-# Hash the password
-hashed_password = hashlib.sha256(WEBHOOK_PASSWORD.encode()).hexdigest()
-print(hashed_password)
-
 
 @app.route('/webhook', methods=['POST'])
 def webhook():
@@ -300,4 +302,4 @@ def get_runners():
     return jsonify(result)
 
 if __name__ == '__main__':
-    app.run(port=3100, debug=True)
+    app.run(host='0.0.0.0', port=3100, debug=True)

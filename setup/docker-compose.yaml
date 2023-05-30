@@ -1,0 +1,26 @@
+version: '3'
+services:
+  backend:
+    build: ../backend
+    ports:
+      - 3100:3100
+    environment:
+      - ORG_NAME=
+      - ACCESS_TOKEN=
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=github
+    depends_on:
+      - db
+
+  db:
+    image: postgres
+    ports:
+      - 5432:5432
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=github
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data

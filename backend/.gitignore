@@ -1,1 +1,26 @@
+# Python-specific files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyz
+*.pyw
+*.pyi
+*.pyproj
+*.egg-info/
+dist/
+build/
+
+# Virtual environment
+venv/
+.env/
+
+# Editor-specific files
+.vscode/
+.idea/
+
+# System-specific files
+*.DS_Store
+Thumbs.db
+
 github
