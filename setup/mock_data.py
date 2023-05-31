@@ -1,7 +1,5 @@
 import random
-import string
 import psycopg2
-from datetime import date, timedelta
 from faker import Faker
 
 # Create an instance of the Faker generator
@@ -32,8 +30,6 @@ cursor.execute("""
 """)
 conn.commit()
 # Generate and insert mock data into the database
-start_date = date(2023, 1, 1)
-end_date = date.today()
 
 for _ in range(10):
     repo_name = f'{fake.name().replace(" ", "-")}-{fake.company_suffix().replace(" ", "-")}/{fake.slug()}'
