@@ -20,4 +20,4 @@ RUN npm run build
 EXPOSE 3000
 
 # Define the command to start the app
-CMD ["npm", "start"]
+CMD ["sh", "-c", "REACT_APP_BACKEND_BASE_URL=$BACKEND_BASE_URL npm start"]
