@@ -1,8 +1,9 @@
-version: '3'
+version: '2'
 services:
 
   backend:
     build: ../backend
+    container_name: backend-container
     ports:
       - 3100:3100
     environment:
@@ -17,6 +18,7 @@ services:
 
   frontend:
     build: ../frontend
+    container_name: frontend-container
     ports:
       - 3000:3000
     environment:

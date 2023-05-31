@@ -1,0 +1,120 @@
+[
+    {
+      "busy": false,
+      "id": 34600,
+      "labels": [
+        {
+          "id": 5,
+          "name": "self-hosted",
+          "type": "read-only"
+        },
+        {
+          "id": 6,
+          "name": "Linux",
+          "type": "read-only"
+        },
+        {
+          "id": 7,
+          "name": "X64",
+          "type": "read-only"
+        },
+        {
+          "id": 11,
+          "name": "Ewok",
+          "type": "custom"
+        }
+      ],
+      "name": "Endor",
+      "status": "online"
+    },
+    {
+      "busy": true,
+      "id": 85621,
+      "labels": [
+        {
+          "id": 8,
+          "name": "Windows",
+          "type": "read-only"
+        },
+        {
+          "id": 12,
+          "name": "Mos-Eisley",
+          "type": "custom"
+        }
+      ],
+      "name": "Tatooine",
+      "status": "offline"
+    },
+    {
+      "busy": false,
+      "id": 19283,
+      "labels": [
+        {
+          "id": 9,
+          "name": "Mac",
+          "type": "read-only"
+        },
+        {
+          "id": 13,
+          "name": "custom-label-2",
+          "type": "custom"
+        }
+      ],
+      "name": "runner-2",
+      "status": "online"
+    },
+    {
+      "busy": false,
+      "id": 54328,
+      "labels": [
+        {
+          "id": 10,
+          "name": "Linux",
+          "type": "read-only"
+        },
+        {
+          "id": 14,
+          "name": "custom-label-3",
+          "type": "custom"
+        }
+      ],
+      "name": "runner-3",
+      "status": "online"
+    },
+    {
+      "busy": true,
+      "id": 71234,
+      "labels": [
+        {
+          "id": 15,
+          "name": "self-hosted",
+          "type": "read-only"
+        },
+        {
+          "id": 16,
+          "name": "custom-label-4",
+          "type": "custom"
+        }
+      ],
+      "name": "runner-4",
+      "status": "online"
+    },
+    {
+      "busy": false,
+      "id": 92761,
+      "labels": [
+        {
+          "id": 17,
+          "name": "Windows",
+          "type": "read-only"
+        },
+        {
+          "id": 18,
+          "name": "custom-label-5",
+          "type": "custom"
+        }
+      ],
+      "name": "runner-5",
+      "status": "offline"
+    }
+]
