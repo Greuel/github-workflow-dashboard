@@ -21,8 +21,6 @@ services:
     container_name: frontend-container
     ports:
       - 3000:3000
-    environment:
-      - BACKEND_BASE_URL=http://host.docker.internal:3100
 
   db:
     image: postgres
