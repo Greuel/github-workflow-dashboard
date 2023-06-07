@@ -24,41 +24,31 @@ jobs:
     # Test build in PR
     # create tags
     - name: Docker meta backend
-      id: meta-backend
+      id: meta
       uses: docker/metadata-action@v3
       with:
-        images: github-workflow-dashboard:backend
-        tags: |
-          type=sha,enable=true,priority=100,prefix=,suffix=,format=short
-          type=raw,enable=true,priority=200,prefix=,suffix=,value=latest
-          
-    - name: Docker meta frontend
-      id: meta-frontend
-      uses: docker/metadata-action@v3
-      with:
-        images: github-workflow-dashboard:frontend
-        tags: |
-          type=sha,enable=true,priority=100,prefix=,suffix=,format=short
-          type=raw,enable=true,priority=200,prefix=,suffix=,value=latest
+        images: github-workflow-dashboard
   
     # build images 
     - name: Build backend
       if: ${{ github.event_name == 'pull_request' }}
-      id: build-latest-backend
+      id: build-backend
       uses: docker/build-push-action@v3
       with:
         context: .
         file: backend/Dockerfile
-        push: false
-        tags: ${{ steps.meta-backend.outputs.tags }}
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: backend-${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
   
     - name: Build frontend
       if: ${{ github.event_name == 'pull_request' }}
-      id: build-latest-frontend
+      id: build-frontend
       uses: docker/build-push-action@v3
       with:
         context: .
         file: frontend/Dockerfile
-        push: false
-        tags: ${{ steps.meta-frontend.outputs.tags }}
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: frontend-${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
 # TODO: only build frontend/backend if files changed for one of them respectively
