@@ -20,7 +20,28 @@ jobs:
       with:
         username: ${{ secrets.dockerhub_user }}
         password: ${{ secrets.dockerhub_token }}
+        
     # Test build in PR
+    # create tags
+    - name: Docker meta backend
+      id: meta-backend
+      uses: docker/metadata-action@v3
+      with:
+        images: github-workflow-dashboard:backend
+        tags: |
+          type=sha,enable=true,priority=100,prefix=,suffix=,format=short
+          type=raw,enable=true,priority=200,prefix=,suffix=,value=latest
+          
+    - name: Docker meta frontend
+      id: meta-frontend
+      uses: docker/metadata-action@v3
+      with:
+        images: github-workflow-dashboard:frontend
+        tags: |
+          type=sha,enable=true,priority=100,prefix=,suffix=,format=short
+          type=raw,enable=true,priority=200,prefix=,suffix=,value=latest
+  
+    # build images 
     - name: Build backend
       if: ${{ github.event_name == 'pull_request' }}
       id: build-latest-backend
@@ -29,7 +50,7 @@ jobs:
         context: .
         file: backend/Dockerfile
         push: false
-        tags: github-workflow-dashboard:backend-$(date +%s)
+        tags: ${{ steps.meta-backend.outputs.tags }}
   
     - name: Build frontend
       if: ${{ github.event_name == 'pull_request' }}
@@ -39,4 +60,5 @@ jobs:
         context: .
         file: frontend/Dockerfile
         push: false
-        tags: github-workflow-dashboard:frontend-$(date +%s)
+        tags: ${{ steps.meta-frontend.outputs.tags }}
+# TODO: only build frontend/backend if files changed for one of them respectively
