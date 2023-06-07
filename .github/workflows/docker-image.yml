@@ -18,7 +18,6 @@ jobs:
     - name: Login to dockerhub
       uses: docker/login-action@v1
       with:
-        registry: hub.docker.com
         username: ${{ secrets.dockerhub_user }}
         password: ${{ secrets.dockerhub_token }}
     # Test build in PR
