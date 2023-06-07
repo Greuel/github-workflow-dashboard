@@ -38,8 +38,8 @@ jobs:
         context: ./backend
         file: backend/Dockerfile
         push: ${{ github.event_name != 'pull_request' }}
-        tags: backend-${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: backend-${{ steps.meta.outputs.labels }}
   
     - name: Build frontend
       if: ${{ github.event_name == 'pull_request' }}
@@ -49,6 +49,6 @@ jobs:
         context: ./frontend
         file: frontend/Dockerfile
         push: ${{ github.event_name != 'pull_request' }}
-        tags: frontend-${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: frontend-${{ steps.meta.outputs.labels }}
 # TODO: only build frontend/backend if files changed for one of them respectively
