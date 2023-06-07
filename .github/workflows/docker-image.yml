@@ -35,7 +35,7 @@ jobs:
       id: build-backend
       uses: docker/build-push-action@v3
       with:
-        context: .
+        context: ./backend
         file: backend/Dockerfile
         push: ${{ github.event_name != 'pull_request' }}
         tags: backend-${{ steps.meta.outputs.tags }}
@@ -46,7 +46,7 @@ jobs:
       id: build-frontend
       uses: docker/build-push-action@v3
       with:
-        context: .
+        context: ./frontend
         file: frontend/Dockerfile
         push: ${{ github.event_name != 'pull_request' }}
         tags: frontend-${{ steps.meta.outputs.tags }}
