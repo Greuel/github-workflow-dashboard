@@ -27,7 +27,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@v3
       with:
-        images: github-workflow-dashboard
+        images: ngroyal/github-workflow-dashboard
   
     # build images 
     - name: Build backend
