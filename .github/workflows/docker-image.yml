@@ -3,6 +3,8 @@ name: Docker Image CI
 on:
   push:
     branches: [ "main" ]
+    tags:
+      - 'v*'
   pull_request:
     branches: [ "main" ]
 
@@ -37,7 +39,7 @@ jobs:
         context: ./backend
         file: backend/Dockerfile
         push: ${{ github.event_name != 'pull_request' }}
-        tags: ${{ steps.meta.outputs.tags }}-backend
+        tags: backend-${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
   
     - name: Build frontend
@@ -47,6 +49,6 @@ jobs:
         context: ./frontend
         file: frontend/Dockerfile
         push: ${{ github.event_name != 'pull_request' }}
-        tags: ${{ steps.meta.outputs.tags }}-frontend
+        tags: frontend-${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
 # TODO: only build frontend/backend if files changed for one of them respectively
