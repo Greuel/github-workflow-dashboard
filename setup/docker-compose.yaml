@@ -1,9 +1,9 @@
-version: '2'
+version: '2.1'
 services:
 
   backend:
-    build: ../backend
-    container_name: backend-container
+    image: ngroyal/github-workflow-dashboard-backend:main
+    container_name: backend
     ports:
       - 3100:3100
     environment:
@@ -12,13 +12,14 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=github
+      - POSTGRES_PORT=5432
     depends_on:
       db:
         condition: service_healthy
 
   frontend:
-    build: ../frontend
-    container_name: frontend-container
+    image: ngroyal/github-workflow-dashboard-frontend:main
+    container_name: frontend
     ports:
       - 3000:3000
 
