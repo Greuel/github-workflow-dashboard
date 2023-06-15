@@ -4,7 +4,7 @@
 The dashboard aims to give an overview of an organisations current workflows and self-hosted runner infrastructure.
 
 ## Features
-- Shows jobs in three states: queued, running, completed
+- Shows jobs in three states: queued, in progress, completed
 - Detailed information can be viewed for queued and running jobs
 - Overview of all jobs in the workflows tab
 - Includes the GitHub status page to get a full overview in one place
