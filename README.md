@@ -10,6 +10,23 @@ The dashboard aims to give an overview of an organisations current workflows and
 - Includes the GitHub status page to get a full overview in one place
 - Shows an organisations self-hosted runners and their current status
 
+## Screenshots
+Workflow overview in the Workflows tab:
+
+<img width="1435" alt="Bildschirmfoto 2023-06-15 um 20 51 16" src="https://github.com/Greuel/github-workflow-dashboard/assets/27424637/8f6d8655-213d-4a4f-a7ed-8525be896d99">
+
+Detailed view for jobs in progress:
+
+<img width="1439" alt="Bildschirmfoto 2023-06-15 um 20 46 04" src="https://github.com/Greuel/github-workflow-dashboard/assets/27424637/b25283cb-1488-4c2c-a517-7694053740e3">
+
+Detailed view for queued jobs (mock data shows very long queue times):
+
+<img width="1438" alt="Bildschirmfoto 2023-06-15 um 20 15 37" src="https://github.com/Greuel/github-workflow-dashboard/assets/27424637/76efb2fe-ee04-4ae6-9ec0-1a4ade819e43">
+
+GitHub status page:
+
+<img width="1445" alt="Bildschirmfoto 2023-06-15 um 20 16 25" src="https://github.com/Greuel/github-workflow-dashboard/assets/27424637/9cb572a4-99aa-4274-acaf-f684ec319d48">
+
 ## Dashboard Setup
 The backend is a python flask application that accepts an incoming webhook from github, writes the data to a postgres database and makes the data available on an API endpoint to be consumed by the frontend.
 The frontend is a react application that consumes the backend API.
@@ -23,7 +40,52 @@ This allows to calculate queue times for jobs to find bottlenecks in your infras
 
 ACCESS_TOKEN must have organization admin rights.
 
-Just run the docker-compose file from the setup directory afer adding your github organisation name and access token.
+The docker-compose file from the setup directory can be used afer adding your github organisation name and access token:
+```
+version: '2.1'
+services:
+
+  backend:
+    image: ngroyal/github-workflow-dashboard-backend:main
+    container_name: backend
+    ports:
+      - 3100:3100
+    environment:
+      - ORG_NAME=
+      - ACCESS_TOKEN=
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=github
+      - POSTGRES_PORT=5432
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    image: ngroyal/github-workflow-dashboard-frontend:main
+    container_name: frontend
+    ports:
+      - 3000:3000
+
+  db:
+    image: postgres
+    ports:
+      - 5432:5432
+    restart: always
+    user: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=github
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+```
+Of course you can use an existing postgres database or run it on a different port.
 For development, you will probably know how to run the services locally.
 
 # GitHub Webhook and Organisation access
@@ -38,23 +100,6 @@ You only need the Workflow Jobs events:
 The biggest concern is opening the backend to receive the webhook events from github. The endpoint should be protected thruogh a webserver of your choice by sending a secret with the webhook payload. Compare https://docs.github.com/en/webhooks-and-events/webhooks/securing-your-webhooks.
 
 That's it!
-
-## Screenshots
-Workflow overview in the Workflows tab:
-
-<img width="1435" alt="Bildschirmfoto 2023-06-15 um 20 51 16" src="https://github.com/Greuel/github-workflow-dashboard/assets/27424637/8f6d8655-213d-4a4f-a7ed-8525be896d99">
-
-Detailed view for jobs in progress:
-
-<img width="1439" alt="Bildschirmfoto 2023-06-15 um 20 46 04" src="https://github.com/Greuel/github-workflow-dashboard/assets/27424637/b25283cb-1488-4c2c-a517-7694053740e3">
-
-Detailed view for queued jobs:
-
-<img width="1438" alt="Bildschirmfoto 2023-06-15 um 20 15 37" src="https://github.com/Greuel/github-workflow-dashboard/assets/27424637/76efb2fe-ee04-4ae6-9ec0-1a4ade819e43">
-
-GitHub status page:
-
-<img width="1445" alt="Bildschirmfoto 2023-06-15 um 20 16 25" src="https://github.com/Greuel/github-workflow-dashboard/assets/27424637/9cb572a4-99aa-4274-acaf-f684ec319d48">
 
 ## Planned features / improvements
 - Queued jobs status should be checked by the frontend application regularily as the webhook or API can have hickups, e.g. due to network connectivity. Currently jobs can be stuck in their status forever and the db needs to be cleaned up manually.
