@@ -27,9 +27,17 @@ Just run the docker-compose file from the setup directory afer adding your githu
 For development, you will probably know how to run the services locally.
 
 # GitHub Webhook and Organisation access
+Create a webhook on organization level with the following details, replacing your Payload URL with your webserver URL (note that the backend is expecting incoming requests on "/webhook", so whatever you use here, your webserver needs to map it to /webhook on the backend application)
+
+<img width="965" alt="Bildschirmfoto 2023-06-15 um 21 14 42" src="https://github.com/Greuel/github-workflow-dashboard/assets/27424637/5de49213-20d5-4e46-89ed-ba9e0f2ea60f">
+
+You only need the Workflow Jobs events:
+<img width="346" alt="Bildschirmfoto 2023-06-15 um 21 14 57" src="https://github.com/Greuel/github-workflow-dashboard/assets/27424637/61c2e2b7-c3be-432a-b05a-e975de907add">
 
 # Security
 The biggest concern is opening the backend to receive the webhook events from github. The endpoint should be protected thruogh a webserver of your choice by sending a secret with the webhook payload. Compare https://docs.github.com/en/webhooks-and-events/webhooks/securing-your-webhooks.
+
+That's it!
 
 ## Screenshots
 Workflow overview in the Workflows tab:
