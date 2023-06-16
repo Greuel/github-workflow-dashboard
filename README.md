@@ -55,6 +55,7 @@ services:
     environment:
       - ORG_NAME=
       - ACCESS_TOKEN=
+      - GITHUB_WEBHOOK_SECRET=
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=github
