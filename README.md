@@ -88,7 +88,7 @@ services:
 Of course you can use an existing postgres database or run it on a different port.
 For development, you will probably know how to run the services locally.
 
-The frontend will then be available on http://localhost:3100 - make it accessible as you please!
+The frontend will then be available on http://localhost:3000 - make it accessible as you please!
 
 ### GitHub Webhook setup and Organisation access
 Create a webhook on organization level with the following details, replacing your Payload URL with your webserver URL (note that the backend is expecting incoming requests on "/webhook", so whatever you use here, your webserver needs to map it to /webhook on the backend application)
