@@ -48,7 +48,7 @@ version: '2.1'
 services:
 
   backend:
-    image: ngroyal/github-workflow-dashboard-backend:main
+    image: ngroyal/github-workflow-dashboard-backend:latest
     container_name: backend
     ports:
       - 3100:3100
@@ -65,7 +65,7 @@ services:
         condition: service_healthy
 
   frontend:
-    image: ngroyal/github-workflow-dashboard-frontend:main
+    image: ngroyal/github-workflow-dashboard-frontend:latest
     container_name: frontend
     ports:
       - 3000:3000
