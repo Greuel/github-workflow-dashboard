@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, abort
 from sqlalchemy import create_engine, Column, Integer, BigInteger, String, DateTime, exists, select, not_
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import exc
@@ -10,6 +10,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timedelta
 import requests
 import hashlib
+import hmac
 import logging
 import os
 import time
@@ -56,11 +57,16 @@ session = Session()
 Base.metadata.create_all(engine)
 
 @app.route('/webhook', methods=['POST'])
+
 def webhook():
-    data = request.get_json()
+    secret_token = os.getenv('GITHUB_WEBHOOK_SECRET')
+    payload_body = request.get_data()
+    signature_header = request.headers.get('x-hub-signature-256')
+    signature_is_valid = verify_signature(payload_body, secret_token, signature_header)
+    data = request.json  # Access JSON data directly
 
     if 'check_run_url' not in data['workflow_job']:
-        return 'Bad Request', 400
+        return 'ERROR', 400
 
     run_url = data['workflow_job']['check_run_url']
     url = data['workflow_job']['url']
@@ -87,7 +93,7 @@ def webhook():
 
             # Create a new job without specifying the id
             new_run = WorkflowRun(repo_name=repo_name, workflow_name=workflow_name,
-                                  event_type=event_type, created_at=created_at, job_id=job_id, run_id=run_id, labels=labels)
+                                      event_type=event_type, created_at=created_at, job_id=job_id, run_id=run_id, labels=labels)
             session.add(new_run)
             session.flush()
 
@@ -108,6 +114,25 @@ def webhook():
     finally:
         session.close()
 
+def verify_signature(payload_body, secret_token, signature_header):
+    # Encode the payload body and secret token
+    """Verify that the payload was sent from GitHub by validating SHA256.
+
+    Raise and return 403 if not authorized.
+
+    Args:
+        payload_body: original request body to verify (request.get_data())
+        secret_token: GitHub app webhook token (GITHUB_WEBHOOK_SECRET)
+        signature_header: header received from GitHub (x-hub-signature-256)
+    """
+    if not signature_header:
+        abort(403, 'x-hub-signature-256 header is missing!')
+    hash_object = hmac.new(secret_token.encode('utf-8'), msg=payload_body, digestmod=hashlib.sha256)
+    expected_signature = "sha256=" + hash_object.hexdigest()
+    print("Expected Signature:", expected_signature)
+    print("Received Signature:", signature_header)
+    if not hmac.compare_digest(expected_signature, signature_header):
+        abort(403, 'Request signatures didn\'t match!')
 
 # Start API
 

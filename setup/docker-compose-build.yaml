@@ -2,14 +2,14 @@ version: '2.1'
 services:
 
   backend:
-    image: ngroyal/github-workflow-dashboard-backend:main
+    build: ../backend
     container_name: backend
     ports:
       - 3100:3100
     environment:
       - ORG_NAME=
       - ACCESS_TOKEN=
-      - GITHUB_WEBHOOK_SECRET=
+      - GITHUB_WEBHOOK_SECRET=T
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=github
@@ -19,7 +19,7 @@ services:
         condition: service_healthy
 
   frontend:
-    image: ngroyal/github-workflow-dashboard-frontend:main
+    build: ../frontend
     container_name: frontend
     ports:
       - 3000:3000
