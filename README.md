@@ -37,8 +37,10 @@ This allows to calculate queue times for jobs to find bottlenecks in your infras
 ### backend, frontend and db
 - ORG_NAME=my-org
 - ACCESS_TOKEN=myadmintoken
+- GITHUB_WEBHOOK_SECRET=mywebhooksecret
 
-ACCESS_TOKEN must have organization admin rights.
+ACCESS_TOKEN must have organization admin rights (This is a personal access (oauth) token from an org admin).
+GITHUB_WEBHOOK_SECRET can be set when creating the webhook in GitHub, see below section about the webhook setup.
 
 The docker-compose file from the setup directory can be used afer adding your github organisation name and access token:
 ```
@@ -46,13 +48,14 @@ version: '2.1'
 services:
 
   backend:
-    image: ngroyal/github-workflow-dashboard-backend:main
+    image: ngroyal/github-workflow-dashboard-backend:latest
     container_name: backend
     ports:
       - 3100:3100
     environment:
       - ORG_NAME=
       - ACCESS_TOKEN=
+      - GITHUB_WEBHOOK_SECRET=
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=github
@@ -62,7 +65,7 @@ services:
         condition: service_healthy
 
   frontend:
-    image: ngroyal/github-workflow-dashboard-frontend:main
+    image: ngroyal/github-workflow-dashboard-frontend:latest
     container_name: frontend
     ports:
       - 3000:3000
@@ -91,15 +94,16 @@ For development, you will probably know how to run the services locally.
 The frontend will then be available on http://localhost:3000 - make it accessible as you please!
 
 ### GitHub Webhook setup and Organisation access
-Create a webhook on organization level with the following details, replacing your Payload URL with your webserver URL (note that the backend is expecting incoming requests on "/webhook", so whatever you use here, your webserver needs to map it to /webhook on the backend application)
+Create a webhook on organization level with the following details, replacing your Payload URL with your webserver URL (note that the backend is expecting incoming requests on "/webhook", so whatever you use here, your webserver needs to map it to /webhook on the backend application). Don't forget to set a secret and pass it into the backend application as an environment variable later:
 
-<img width="965" alt="Bildschirmfoto 2023-06-15 um 21 14 42" src="https://github.com/Greuel/github-workflow-dashboard/assets/27424637/5de49213-20d5-4e46-89ed-ba9e0f2ea60f">
+<img width="947" alt="Bildschirmfoto 2023-06-16 um 12 41 23" src="https://github.com/Greuel/github-workflow-dashboard/assets/27424637/d7e6b457-e244-468a-9c26-5355be4a0601">
 
 You only need the Workflow Jobs events:
+
 <img width="346" alt="Bildschirmfoto 2023-06-15 um 21 14 57" src="https://github.com/Greuel/github-workflow-dashboard/assets/27424637/61c2e2b7-c3be-432a-b05a-e975de907add">
 
 ## Security
-The biggest concern is opening the backend to receive the webhook events from github. The endpoint should be protected through a webserver of your choice by sending a secret with the webhook payload. Compare https://docs.github.com/en/webhooks-and-events/webhooks/securing-your-webhooks.
+The biggest concern is opening the backend to receive the webhook events from github. Thus, the /webhook endpoint is protected by receiving a secret token from the github webhook payload and verifying that the correct header is sent. Compare https://docs.github.com/en/webhooks-and-events/webhooks/securing-your-webhooks.
 
 That's it!
 
