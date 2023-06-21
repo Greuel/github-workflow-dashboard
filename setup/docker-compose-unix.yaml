@@ -2,7 +2,7 @@ version: '2.1'
 services:
 
   backend:
-    image: ngroyal/github-workflow-dashboard-backend:main
+    image: ngroyal/github-workflow-dashboard-backend:latest
     container_name: backend
     ports:
       - 3100:3100
@@ -17,9 +17,11 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
 
   frontend:
-    image: ngroyal/github-workflow-dashboard-frontend:main
+    image: ngroyal/github-workflow-dashboard-frontend:latest
     container_name: frontend
     ports:
       - 3000:3000
@@ -40,4 +42,7 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=github
     volumes:
-      - ./pgdata:/var/lib/postgresql/data
+      - pgdata-workflows:/var/lib/postgresql/data
+
+volumes:
+  pgdata-workflows:
