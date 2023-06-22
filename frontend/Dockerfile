@@ -19,7 +19,7 @@ FROM nginx:1.17-alpine
 
 COPY --from=build-deps /app/build /usr/share/nginx/html
 
-COPY nginx.config /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Define the command to start the app
 ENTRYPOINT ["nginx", "-g", "daemon off;"]
