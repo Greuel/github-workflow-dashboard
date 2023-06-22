@@ -9,6 +9,7 @@ COPY package*.json ./
 
 # Install the app dependencies
 RUN npm install
+RUN npm install -g serve
 
 # Copy the app's source code to the container
 COPY . .
@@ -20,4 +21,4 @@ RUN npm run build
 EXPOSE 3000
 
 # Define the command to start the app
-CMD ["sh", "-c", "REACT_APP_BACKEND_BASE_URL=$BACKEND_BASE_URL npm start"]
+CMD ["sh", "-c", "REACT_APP_BACKEND_BASE_URL=$BACKEND_BASE_URL serve -s build"]
