@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-export const BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL || 'http://localhost:3100';
+export const BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL || `${location.protocol}://${location.hostname}${process.env.PUBLIC_URL}/api`;
 
 function useData<T>(api: string) {
   const [data, setData] = useState<T>();

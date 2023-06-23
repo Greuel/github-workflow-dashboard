@@ -80,7 +80,7 @@ function NavigationDrawer() {
             }}
           >
             <IconButton sx={{ minHeight: isMobile ? '56px' : '64px', boxSizing: 'border-box' }}>
-              <img src="logo192.png" alt="Logo" height={36} />
+              <img src="/workflow-dashboard/logo192.png" alt="Logo" height={36} />
             </IconButton>
             <Divider />
             <React.Fragment>
