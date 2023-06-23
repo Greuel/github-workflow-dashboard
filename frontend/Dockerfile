@@ -6,7 +6,6 @@ COPY package*.json ./
 
 # Install the app dependencies
 RUN npm install
-RUN npm install -g serve
 
 # Copy the app's source code to the container
 COPY . .
