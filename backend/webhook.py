@@ -23,13 +23,14 @@ postgres_user = os.getenv('POSTGRES_USER')
 postgres_password = os.getenv('POSTGRES_PASSWORD')
 postgres_db = os.getenv('POSTGRES_DB')
 postgres_port = os.getenv('POSTGRES_PORT')
+postgres_host = os.getenv('POSTGRES_HOST')
 
 
 # SQLAlchemy setup
 engine = create_engine(
-    f'postgresql://{postgres_user}:{postgres_password}@host.docker.internal:{postgres_port}/{postgres_db}')
+    f'postgresql://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_db}')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{postgres_user}:{postgres_password}@host.docker.internal:{postgres_port}/{postgres_db}'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_db}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -157,6 +158,61 @@ class WorkflowRun(db.Model):
         self.run_id = run_id
         self.labels = labels
 
+@app.route('/workflows-completed-count', methods=['GET'])
+def get_workflow_completed():
+    try:
+        # Execute the SQL query to fetch the workflow summary
+        query = text("""
+        SELECT workflow_name, COUNT(*) AS num_completed_workflows
+        FROM workflow_runs
+        WHERE event_type = 'completed'
+        GROUP BY workflow_name ORDER BY num_completed_workflows DESC
+        """)
+        result = db.session.execute(query)
+
+        # Convert the query result to a list of dictionaries
+        workflow_summary = [
+            {
+                'workflow_name': row[0],
+                'num_workflows': row[1]
+            }
+            for row in result
+        ]
+
+        # Return the workflow summary as JSON response
+        return jsonify(workflow_summary)
+
+    except Exception as e:
+        # Handle the exception
+        return str(e), 500
+
+@app.route('/workflows-completed-count-by-repo', methods=['GET'])
+def get_workflow_completed_by_repo():
+    try:
+        # Execute the SQL query to fetch the workflow summary
+        query = text("""
+        SELECT repo_name, COUNT(*) AS num_completed_jobs
+        FROM workflow_runs
+        WHERE event_type = 'completed'
+        GROUP BY repo_name ORDER BY num_completed_jobs DESC
+        """)
+        result = db.session.execute(query)
+
+        # Convert the query result to a list of dictionaries
+        workflow_summary = [
+            {
+                'repo_name': row[0],
+                'num_workflows': row[1]
+            }
+            for row in result
+        ]
+
+        # Return the workflow summary as JSON response
+        return jsonify(workflow_summary)
+
+    except Exception as e:
+        # Handle the exception
+        return str(e), 500
 
 @app.route('/workflow_runs')
 def get_workflow_runs():

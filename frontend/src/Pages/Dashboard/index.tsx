@@ -6,6 +6,8 @@ import { ProgressSize } from './Progress';
 import Completed from './Completed';
 import Runners from './Runners';
 import GitHubStatus from './GitHubStatus';
+import CompletedWorkflows from './CompletedWorkflows';
+import CompletedWorkflowsPerRepo from './CompletedWorkflowsByRepo';
 
 function Dashboard() {
   return (
@@ -50,6 +52,16 @@ function Dashboard() {
         <Grid item xs={12}>
           <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
             <Runners />
+          </Paper>
+        </Grid>
+        <Grid item xs={12} md={4} lg={6}>
+          <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+            <CompletedWorkflows />
+          </Paper>
+        </Grid>
+        <Grid item xs={12} md={4} lg={6}>
+          <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+            <CompletedWorkflowsPerRepo />
           </Paper>
         </Grid>
       </Grid>
