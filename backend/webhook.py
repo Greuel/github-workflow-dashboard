@@ -23,14 +23,13 @@ postgres_user = os.getenv('POSTGRES_USER')
 postgres_password = os.getenv('POSTGRES_PASSWORD')
 postgres_db = os.getenv('POSTGRES_DB')
 postgres_port = os.getenv('POSTGRES_PORT')
-postgres_host = os.getenv('POSTGRES_HOST')
 
 
 # SQLAlchemy setup
 engine = create_engine(
-    f'postgresql://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_db}')
+    f'postgresql://{postgres_user}:{postgres_password}@host.docker.internal:{postgres_port}/{postgres_db}')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_db}'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{postgres_user}:{postgres_password}@host.docker.internal:{postgres_port}/{postgres_db}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
