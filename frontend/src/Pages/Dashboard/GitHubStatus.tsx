@@ -54,11 +54,11 @@ function GitHubStatus() {
       >
         {status ? (
           <div>
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h6" gutterBottom align="center">
               GitHub Status
             </Typography>
             {status.status.indicator === 'none' ? (
-              <Typography variant="subtitle1">All systems operational</Typography>
+              <Typography variant="subtitle1" align="center">All systems operational</Typography>
             ) : (
               <div>
                 {status.components.map((component) => (

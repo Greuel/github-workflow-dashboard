@@ -8,6 +8,7 @@ import Runners from './Runners';
 import GitHubStatus from './GitHubStatus';
 import CompletedWorkflows from './CompletedWorkflows';
 import CompletedWorkflowsPerRepo from './CompletedWorkflowsByRepo';
+import UpdateWorkflowStatusButton from './UpdateWorkflowStatus';
 
 function Dashboard() {
   return (
@@ -42,7 +43,10 @@ function Dashboard() {
               </Paper>
             </Grid>
             <Grid item xs={12} md={4} lg={3}>
-              <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height: 240 }}>
+            <Paper sx={{ p: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', height: 100, justifyContent: 'center' }}>
+              <UpdateWorkflowStatusButton />
+            </Paper>
+              <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height: 120, justifyContent: 'center' }}>
                 <GitHubStatus />
               </Paper>
             </Grid>

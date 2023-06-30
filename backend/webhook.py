@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, abort
+from flask import Flask, request, jsonify, abort, current_app
 from sqlalchemy import create_engine, Column, Integer, BigInteger, String, DateTime, exists, select, not_
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import exc
@@ -25,6 +25,7 @@ postgres_db = os.getenv('POSTGRES_DB')
 postgres_port = os.getenv('POSTGRES_PORT')
 postgres_host = os.getenv('POSTGRES_HOST')
 
+logging.basicConfig(level=logging.INFO, format='%(message)s')
 
 # SQLAlchemy setup
 engine = create_engine(
@@ -157,6 +158,18 @@ class WorkflowRun(db.Model):
         self.job_id = job_id
         self.run_id = run_id
         self.labels = labels
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'repo_name': self.repo_name,
+            'created_at': self.created_at,
+            'event_type': self.event_type,
+            'workflow_name': self.workflow_name,
+            'run_id': self.run_id,
+            'job_id': self.job_id,
+            'labels': self.labels
+        }
 
 @app.route('/workflows-completed-count', methods=['GET'])
 def get_workflow_completed():
@@ -379,6 +392,151 @@ def get_runners():
         })
 
     return jsonify(result)
+
+@app.route('/update-workflow-status', methods=['POST'])
+def check_workflow_status():
+    subquery_completed = db.session.query(WorkflowRun.job_id).filter(
+        WorkflowRun.event_type == 'completed'
+    )
+    subquery_waiting = db.session.query(WorkflowRun.job_id).filter(
+        WorkflowRun.event_type == 'waiting'
+    )
+    subquery_in_progress = db.session.query(WorkflowRun.job_id).filter(
+        WorkflowRun.event_type == 'in_progress'
+    )
+
+    queued_workflows = []
+    in_progress_workflows = []
+
+    repo_names = db.session.query(WorkflowRun.repo_name).distinct().all()
+    for repo_name in repo_names:
+        repo_name = repo_name[0]
+        queued = WorkflowRun.query.filter(
+            WorkflowRun.repo_name == repo_name,
+            WorkflowRun.event_type == 'queued',
+            WorkflowRun.job_id.notin_(subquery_completed),
+            WorkflowRun.job_id.notin_(subquery_waiting),
+            WorkflowRun.job_id.notin_(subquery_in_progress)
+        ).all()
+
+        in_progress = WorkflowRun.query.filter(
+            WorkflowRun.repo_name == repo_name,
+            WorkflowRun.event_type == 'in_progress',
+            WorkflowRun.job_id.notin_(subquery_completed),
+            WorkflowRun.job_id.notin_(subquery_waiting)
+        ).all()
+
+        queued_workflows.extend(queued)
+        in_progress_workflows.extend(in_progress)
+
+    logger = logging.getLogger('workflow-status')
+    log_messages = []
+# Iterate over queued workflows
+    for workflow in queued_workflows:
+        repo_name = workflow.repo_name
+        job_id = workflow.job_id
+
+        # Make the GitHub API request to get the current status of the job
+        github_api_url = f'https://api.github.com/repos/{repo_name}/actions/jobs/{job_id}'
+        headers = {
+            'Accept': 'application/vnd.github+json',
+            'Authorization': f'Bearer {access_token}',
+            'X-GitHub-Api-Version': '2022-11-28'
+        }
+        response = requests.get(github_api_url, headers=headers)
+
+        if response.status_code == 200:
+            # Parse the response and extract the current status
+            job_data = response.json()
+            current_status = job_data.get('status')
+
+            # Check if the current status is different from the existing status in the database
+            if workflow.event_type != current_status:
+                # Create a new entry with the current status
+                new_workflow = WorkflowRun(
+                    repo_name=workflow.repo_name,
+                    created_at=workflow.created_at,
+                    event_type=current_status,
+                    workflow_name=workflow.workflow_name,
+                    job_id=workflow.job_id,
+                    run_id=workflow.run_id,
+                    labels=workflow.labels
+                )
+                db.session.add(new_workflow)
+                db.session.commit()
+
+                # Log an update for the job
+                update_message = f'Updated job {job_id} in repository {repo_name} with status {current_status}'
+                log_messages.append(update_message)
+                logger.info(update_message)
+
+    if not queued_workflows:
+        no_updates_message = 'No queued job updates found.'
+        log_messages.append(no_updates_message)
+        logger.info(no_updates_message)
+
+    # Iterate over in-progress workflows
+    for workflow in in_progress_workflows:
+        repo_name = workflow.repo_name
+        job_id = workflow.job_id
+
+        # Make the GitHub API request to get the current status of the job
+        github_api_url = f'https://api.github.com/repos/{repo_name}/actions/jobs/{job_id}'
+        headers = {
+            'Accept': 'application/vnd.github+json',
+            'Authorization': f'Bearer {access_token}',
+            'X-GitHub-Api-Version': '2022-11-28'
+        }
+        response = requests.get(github_api_url, headers=headers)
+
+        if response.status_code == 200:
+            # Parse the response and extract the current status
+            job_data = response.json()
+            current_status = job_data.get('status')
+
+            # Check if the current status is different from the existing status in the database
+            if workflow.event_type != current_status:
+                # Create a new entry with the current status
+                new_workflow = WorkflowRun(
+                    repo_name=workflow.repo_name,
+                    created_at=workflow.created_at,
+                    event_type=current_status,
+                    workflow_name=workflow.workflow_name,
+                    job_id=workflow.job_id,
+                    run_id=workflow.run_id,
+                    labels=workflow.labels
+                )
+                db.session.add(new_workflow)
+                db.session.commit()
+
+                # Log an update for the job
+                update_message = f'Updated job {job_id} in repository {repo_name} with status {current_status}'
+                log_messages.append(update_message)
+                logger.info(update_message)
+
+    if not in_progress_workflows:
+        no_updates_message = 'No in progress job updates found.'
+        log_messages.append(no_updates_message)
+        logger.info(no_updates_message)
+
+
+    queued_data = [
+        workflow.to_dict()
+        for workflow in queued_workflows
+    ]
+
+    in_progress_data = [
+        workflow.to_dict()
+        for workflow in in_progress_workflows
+    ]
+
+    return jsonify({
+        'queued_count': len(queued_workflows),
+        'queued_workflows': queued_data,
+        'in_progress_count': len(in_progress_workflows),
+        'in_progress_workflows': in_progress_data,
+        'log_messages': log_messages
+    })
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3100, debug=True)
