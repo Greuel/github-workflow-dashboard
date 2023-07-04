@@ -56,7 +56,7 @@ const UpdateWorkflowStatusButton = () => {
         )}
       </Paper>
 
-      <Dialog open={open} onClose={() => setOpen(false)}>
+      <Dialog open={open} onClose={() => { setOpen(false); window.location.reload(); }}>
         <DialogTitle>Job Status Update</DialogTitle>
         <DialogContent>
           {response ? (
