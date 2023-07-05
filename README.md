@@ -1,5 +1,5 @@
 # github-workflow-dashboard
-<img width="1438" alt="Bildschirmfoto 2023-06-15 um 20 30 48" src="https://github.com/Greuel/github-workflow-dashboard/assets/27424637/9cc02f36-1bb9-474c-a58b-76d9146c4cc8">
+![Bildschirmfoto 2023-06-30 um 23 44 37](https://github.com/Greuel/github-workflow-dashboard/assets/27424637/50c37d2b-dbb0-4791-92cf-f1f0d92d41ff)
 
 The dashboard aims to give an overview of an organisations current workflows and self-hosted runner infrastructure.
 
@@ -9,6 +9,7 @@ The dashboard aims to give an overview of an organisations current workflows and
 - Overview of all jobs in the workflows tab
 - Includes the GitHub status page to get a full overview in one place
 - Shows an organisations self-hosted runners and their current status
+- Update button to check job status and update them accordinlgy using the GitHub api (required as jobs can get stuck in their state if webhooks fail from github to the backend)
 
 ## Screenshots
 Workflow overview in the Workflows tab:
@@ -60,9 +61,12 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=github
       - POSTGRES_PORT=5432
+      - POSTGRES_HOST=host.docker.internal
     depends_on:
       db:
         condition: service_healthy
+    extra_hosts:
+          - "host.docker.internal:172.17.0.1"
 
   frontend:
     image: ngroyal/github-workflow-dashboard-frontend:latest
@@ -93,6 +97,16 @@ For development, you will probably know how to run the services locally.
 
 The frontend will then be available on http://localhost:3000 - make it accessible as you please!
 
+The frontend assumes that the user also has access to the backend API as it is doing client side requests. The following endpoints need to be exposed from your webserver/proxy and be routed to the backend service:
+- /workflows-completed-count
+- /workflows-completed-count-by-repo
+- /workflow_runs
+- /queue
+- /in_progress
+- /completed
+- /runners
+- /update-workflow-status
+
 ### GitHub Webhook setup and Organisation access
 Create a webhook on organization level with the following details, replacing your Payload URL with your webserver URL (note that the backend is expecting incoming requests on "/webhook", so whatever you use here, your webserver needs to map it to /webhook on the backend application). Don't forget to set a secret and pass it into the backend application as an environment variable later:
 
@@ -108,5 +122,4 @@ The biggest concern is opening the backend to receive the webhook events from gi
 That's it!
 
 ## Planned features / improvements
-- Queued jobs status should be checked by the frontend application regularily as the webhook or API can have hickups, e.g. due to network connectivity. Currently jobs can be stuck in their status forever and the db needs to be cleaned up manually.
 - More math: Having all workflow history in the database means there is potential for a lot of insights. Top 5 repositories, most run workflows, longest taking jobs, longest waiting runners per tag etc.
