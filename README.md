@@ -97,7 +97,9 @@ For development, you will probably know how to run the services locally.
 
 The frontend will then be available on http://localhost:3000 - make it accessible as you please!
 
-The frontend assumes that the user also has access to the backend API as it is doing client side requests. The following endpoints need to be exposed from your webserver/proxy and be routed to the backend service:
+The frontend assumes that the user also has access to the backend api as it is doing client side requests.
+Default URL for frontend to access the backend api: `${location.protocol}${process.env.PUBLIC_URL}/api`
+The following endpoints need to be exposed from your webserver/proxy and be routed to the backend service:
 - /workflows-completed-count
 - /workflows-completed-count-by-repo
 - /workflow_runs
@@ -107,8 +109,84 @@ The frontend assumes that the user also has access to the backend API as it is d
 - /runners
 - /update-workflow-status
 
+Or, in other words (nginx example), assuming the dashboard will be available on https://example.com/workflow-dashboard and using defaults:
+```
+map $http_x_forwarded_for $block {
+  # my allowed ip (e.g. company VPN)
+  123.123.123.123              '';
+  # default deny
+  default                 1;
+}
+
+server {
+    listen              443 ssl;
+    server_name         example.com;
+    # github workflow webhook
+        location /github_webhook {
+                proxy_pass http://localhost:3100/webhook;
+        }
+        # workflow API
+        location /workflow-dashboard/api/queue {
+                proxy_pass http://localhost:3100/queue;
+                if ($block) {
+                    return 403;
+                }
+        }
+        location /workflow-dashboard/api/update-workflow-status {
+                proxy_pass http://localhost:3100/update-workflow-status;
+                if ($block) {
+                    return 403;
+                }
+        }
+        location /workflow-dashboard/api/workflows-completed-count {
+                proxy_pass http://localhost:3100/workflows-completed-count;
+                if ($block) {
+                    return 403;
+                }
+        }
+        location /workflow-dashboard/api/workflows-completed-count-by-repo {
+                proxy_pass http://localhost:3100/workflows-completed-count-by-repo;
+                if ($block) {
+                    return 403;
+                }
+        }
+        location /workflow-dashboard/api/in_progress {
+                proxy_pass http://localhost:3100/in_progress;
+                if ($block) {
+                    return 403;
+                }
+        }
+        location /workflow-dashboard/api/completed {
+                proxy_pass http://localhost:3100/completed;
+                if ($block) {
+                    return 403;
+                }
+        }
+        location /workflow-dashboard/api/runners {
+                proxy_pass http://localhost:3100/runners;
+                if ($block) {
+                    return 403;
+                }
+        }
+        location /workflow-dashboard/api/workflow_runs {
+                proxy_pass http://localhost:3100/workflow_runs;
+                if ($block) {
+                    return 403;
+                }
+        }
+        # workflow dashboard
+        location /workflow-dashboard {
+                proxy_pass http://localhost:3000;
+                if ($block) {
+                    return 403;
+                }
+        }
+}
+```
+
+
 ### GitHub Webhook setup and Organisation access
-Create a webhook on organization level with the following details, replacing your Payload URL with your webserver URL (note that the backend is expecting incoming requests on "/webhook", so whatever you use here, your webserver needs to map it to /webhook on the backend application). Don't forget to set a secret and pass it into the backend application as an environment variable later:
+Create a webhook on organization level with the following details, replacing your Payload URL with your webserver URL (note that the backend is expecting incoming requests on "/webhook", so whatever you use here, your webserver needs to map it to /webhook on the backend application - from the example above this would be https://example.com/github_webhook). Don't forget to set a secret and pass it into the backend application as an environment variable later:
 
 <img width="947" alt="Bildschirmfoto 2023-06-16 um 12 41 23" src="https://github.com/Greuel/github-workflow-dashboard/assets/27424637/d7e6b457-e244-468a-9c26-5355be4a0601">
 
